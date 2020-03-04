@@ -4,7 +4,6 @@ sys.path.append('/usr/local/lib/python3.7/site-packages')
 import cv2 as cv
 
 cap = cv.VideoCapture(0)
-
 fourcc = cv.VideoWriter_fourcc(*'XVID')
 out = cv.VideoWriter('saidavideo.avi',fourcc,20.0,(640,480))
 
