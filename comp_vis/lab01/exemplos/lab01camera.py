@@ -1,10 +1,9 @@
 import numpy as np
 import sys
-sys.path.append('/usr/local/lib/python3.7/site-packages')
 import cv2 as cv
 
 cap = cv.VideoCapture(0)
-
+print("pegou")
 while(True):
 	ret, frame = cap.read()
 	gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
