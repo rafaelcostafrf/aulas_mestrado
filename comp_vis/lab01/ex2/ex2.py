@@ -3,33 +3,30 @@ import sys
 import time
 sys.path.append('/usr/local/lib/python3.7/site-packages')
 import cv2
+from setup_camera import set_camera
+
+fps = 20.0
+largura = 320
+altura = 240
+brilho = 120
 
 cap = cv2.VideoCapture(0)
 
-cap.set(3, 320)
-cap.set(4, 240)
-cap.set(15, -5)
-cap.set(10, 120)
+set_camera(largura, altura, fps, brilho, cap)
 
-fps = 10.0
 
-print("O framerate da webcam: " + str(fps))
+fourcc = cv2.VideoWriter_fourcc(*'XVID')
+out = cv2.VideoWriter('saidavideo.avi',fourcc,fps,(largura,altura))
 
-fourcc = cv2.VideoWriter_fourcc(*'MJPG')
-out = cv2.VideoWriter('saidavideo.avi',fourcc,fps,(320,240))
-
-inicio = time.perf_counter()
 while (cap.isOpened()):
 	ret, frame = cap.read()
 	if ret == True:
-		if time.perf_counter()-inicio > 1/fps:
-			inicio = time.perf_counter()
-			out.write(frame)
-			cv2.imshow('frame',frame)
-			if cv2.waitKey(1) & 0xFF == ord('q'):
-				break
+		out.write(frame)
+		cv2.imshow('frame',frame)
+		if cv2.waitKey(1) & 0xFF == ord('q'):
+			break
 	else:
-		break 
+		break
 cap.release()
 out.release()
 cv2.destroyAllWindows()
@@ -37,9 +34,9 @@ cv2.destroyAllWindows()
 cap = cv2.VideoCapture('saidavideo.avi')
 
 while(cap.isOpened()):
-	inicio = time.perf_counter()
 	ret, frame = cap.read()
-	if ret == True:		
+	if ret == True:
+		inicio = time.perf_counter()
 		cv2.imshow('frame',frame)
 	else:
 		break
