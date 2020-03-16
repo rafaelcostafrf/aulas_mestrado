@@ -27,12 +27,13 @@ ind = np.arange(256)
 for ii in range(largura):
     for jj in range(altura):
         hist[img[ii,jj]] += 1
+plt.figure(figsize=(10,10))
 plt.plot(ind,hist)
 plt.show()
 
 
 img2 = cv2.imread('arquivos_auxiliares/rice.png')
-(largura, altura) = img.shape[:2]
+(largura, altura) = img2.shape[:2]
 
 hist = np.zeros(256)
 ind = np.arange(256)
@@ -40,6 +41,7 @@ ind = np.arange(256)
 for ii in range(largura):
     for jj in range(altura):
         hist[img2[ii,jj]] += 1
+plt.figure(figsize=(10,10))
 plt.plot(ind,hist)
 plt.show()
 

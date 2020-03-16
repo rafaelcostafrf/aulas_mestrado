@@ -15,14 +15,16 @@
 
 import cv2
 import numpy as np
+from matplotlib import pyplot as plt
 
 img = cv2.imread('fotos_ex/objeto.jpg')
 
 #escala de cinza
 img_c = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 _,th1 = cv2.threshold(img_c,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-cv2.imshow('teste',th1)
-cv2.waitKey(0)
+plt.figure(figsize=(10,10))
+plt.imshow(th1, cmap='gray', vmin=0, vmax=255)
+plt.show()
 
 #colorida
 img_b = img[:,:,0]
@@ -39,5 +41,6 @@ img_th = np.zeros([largura,altura,3], dtype=np.uint8)
 img_th[:,:,0]=thb
 img_th[:,:,1]=thg
 img_th[:,:,2]=thr
-cv2.imshow('teste',img_th)
-cv2.waitKey(0)
+plt.figure(figsize=(10,10))
+plt.imshow(cv2.cvtColor(img_th,cv2.COLOR_BGR2RGB))
+plt.show()

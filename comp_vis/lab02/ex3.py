@@ -13,6 +13,7 @@
 # Abre uma foto e realiza dez passos de limiarizacao, de 0 a 100%.
 # Operacao pixel a pixel, o openCv trabalha com intensidades 0 para o valor Falso e 255 para o valor True.
 
+from matplotlib import pyplot as plt
 import cv2
 import numpy as np
 
@@ -33,9 +34,9 @@ for k in lim:
                 thr[ii,jj] = 0
             else:
                 thr[ii,jj] = 255
-    cv2.imshow(("limiarizacao em %.1f" %k),thr)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    plt.figure(figsize=(10,10))
+    plt.imshow(thr, cmap='gray', vmin=0, vmax=255)
+    plt.show()
                 
         
             

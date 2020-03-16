@@ -13,6 +13,7 @@
 # Descricao no passo a passo do algoritmo
 
 
+from matplotlib import pyplot as plt
 import numpy as np
 import cv2
 
@@ -30,8 +31,9 @@ for ii in range(largura):
                 img_camera[ii,jj] = 255
             else:
                 img_camera[ii,jj] = img_camera[ii,jj] + cte
-cv2.imshow('Imagem exposição alterada',img_camera)
-cv2.waitKey(0)
+plt.figure(figsize=(10,10)) 
+plt.imshow(img_camera, cmap='gray', vmin=0, vmax=255)
+plt.show()
 
 
 #Soma ponderada das imagens dos carrinhos em escala de cinza 8 bits
@@ -58,9 +60,9 @@ for ii in range(largura):
             imgp_c[ii,jj] = cte*img4_c[ii,jj]+cte*img5_c[ii,jj]+cte*img6_c[ii,jj]
         else:
             imgp_c[ii,jj] = cte*img4_c[ii,jj]+cte*img5_c[ii,jj]+cte*img6_c[ii,jj]
-            
-cv2.imshow('soma ponderada pb',imgp_c)
-cv2.waitKey(0)
+plt.figure(figsize=(10,10)) 
+plt.imshow(imgp_c, cmap='gray', vmin=0, vmax=255)
+plt.show()
 
 #Soma ponderada das imagens dos carrinhos em BGR 8 bits
 
@@ -74,9 +76,9 @@ for ii in range(largura):
                 imgp_col[ii,jj,k] = cte*img4[ii,jj,k]+cte*img5[ii,jj,k]+cte*img6[ii,jj,k]
             else:
                 imgp_col[ii,jj,k] = cte*img4[ii,jj,k]+cte*img5[ii,jj,k]+cte*img6[ii,jj,k]
-                
-cv2.imshow('soma ponderada colorida',imgp_col)
-cv2.waitKey(0)
+plt.figure(figsize=(10,10))                
+plt.imshow(cv2.cvtColor(imgp_col,cv2.COLOR_BGR2RGB))
+plt.show()
 
 #Subtracao das imagens de coca-cola colorida
 
@@ -94,8 +96,9 @@ for ii in range(largura):
                 img_sub[ii,jj,k] = 0
             else:
                 img_sub[ii,jj,k] = img7[ii,jj,k]-img8[ii,jj,k]
-cv2.imshow('subtracao coca cola',img_sub)
-cv2.waitKey(0)
+plt.figure(figsize=(10,10))            
+plt.imshow(img_sub)
+plt.show()
 
 #Subtracao das imagens de coca-cola em escala de cinzas
 
@@ -118,8 +121,7 @@ for ii in range(largura):
             img_sub_c[ii,jj] = 0
         else:
             img_sub_c[ii,jj] = img7_c[ii,jj]-img8_c[ii,jj]
-              
-            
-cv2.imshow('subtracao pb',img_sub_c)
-cv2.waitKey(0)
+plt.figure(figsize=(10,10))              
+plt.imshow(img_sub_c, cmap='gray', vmin=0, vmax=255)
+plt.show()
 

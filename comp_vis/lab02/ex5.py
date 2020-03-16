@@ -29,7 +29,7 @@ for ii in range(largura):
     for jj in range(altura):
         for k in range(3):
             hist[img_c[ii,jj,k],k] += 1
-            
+plt.figure(figsize=(10,10))            
 b=plt.plot(ind,hist[:,0],color='b')
 g=plt.plot(ind,hist[:,1],color='g')
 r=plt.plot(ind,hist[:,2],color='r')
@@ -40,19 +40,25 @@ img_c_g = img_c[:,:,1]
 img_c_r = img_c[:,:,2]
 
 img_eq_b = cv2.equalizeHist(img_c_b)
-cv2.imshow('teste',img_eq_b)
-cv2.waitKey(0)
+plt.figure(figsize=(10,10))
+plt.imshow(img_eq_b, cmap='gray', vmin=0, vmax=255)
+plt.show()
+
 img_eq_g = cv2.equalizeHist(img_c_g)
-cv2.imshow('teste',img_eq_g)
-cv2.waitKey(0)
+plt.figure(figsize=(10,10))
+plt.imshow(img_eq_g, cmap='gray', vmin=0, vmax=255)
+plt.show()
+
 img_eq_r = cv2.equalizeHist(img_c_r)
-cv2.imshow('teste',img_eq_r)
-cv2.waitKey(0)
+plt.figure(figsize=(10,10))
+plt.imshow(img_eq_r, cmap='gray', vmin=0, vmax=255)
+plt.show()
 
 img_eq = np.zeros([largura,altura,3], dtype=np.uint8)
 img_eq[:,:,0] = img_eq_b
 img_eq[:,:,1] = img_eq_g
 img_eq[:,:,2] = img_eq_r
 
-cv2.imshow('histograma equalizado',img_eq)
-cv2.waitKey(0)
+plt.figure(figsize=(10,10))
+plt.imshow(cv2.cvtColor(img_eq,cv2.COLOR_BGR2RGB))
+plt.show()

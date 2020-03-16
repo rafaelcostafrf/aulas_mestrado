@@ -16,8 +16,9 @@
 
 import numpy as np
 import cv2
+from matplotlib import pyplot as plt
 
-img = cv2.imread('arquivos_auxiliares/Tile_WazirKhanmosque.jpg')
+img = cv2.cvtColor(cv2.imread('arquivos_auxiliares/Tile_WazirKhanmosque.jpg'),cv2.COLOR_BGR2RGB)
 ruido = np.uint8((1.5*img.std()*np.random.random(img.shape)))
 img = img+ruido
 
@@ -25,23 +26,32 @@ size=5
 
 k_f = cv2.GaussianBlur(img,(size,size),10)
 
-cv2.imshow('teste2',img)
-cv2.imshow('teste',k_f)
-cv2.waitKey(0)
+plt.figure(figsize=(20,20))
+plt.subplot(121)
+plt.imshow(img)
+plt.subplot(122)
+plt.imshow(k_f)
+plt.show()
 
 
 size=5
 
 k_f = cv2.blur(img,(size,size))
 
-cv2.imshow('teste2',img)
-cv2.imshow('teste',k_f)
-cv2.waitKey(0)
+plt.figure(figsize=(20,20))
+plt.subplot(121)
+plt.imshow(img)
+plt.subplot(122)
+plt.imshow(k_f)
+plt.show()
 
 size=5
 
 k_f = cv2.medianBlur(img,size)
 
-cv2.imshow('teste2',img)
-cv2.imshow('teste',k_f)
-cv2.waitKey(0)
+plt.figure(figsize=(20,20))
+plt.subplot(121)
+plt.imshow(img)
+plt.subplot(122)
+plt.imshow(k_f)
+plt.show()
