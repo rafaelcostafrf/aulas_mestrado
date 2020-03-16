@@ -1,3 +1,18 @@
+# INF209B − TOPICOS ESPECIAIS EM PROCESSAMENTO DE SINAIS:
+# VISAO COMPUTACIONAL
+#
+# PRATICA 02
+#
+# RA: 21201920754
+# NOME: RAFAEL COSTA FERNANDES
+#
+# E−MAIL: COSTA.FERNANDES@UFABC.EDU.BR
+#
+# DESCRICAO:
+# Exercicio n.6 - Binarizacao de OTSU
+# Abre uma foto e binariza pelo algoritmo de OTSU, utilizando a funcao do openCv cv2.THRESH_BINARY+cv2.THRESH_OTSU
+# Para o colorido, os canais BGR foram separados em imagens independentes, binarizados e recombinados
+
 import cv2
 import numpy as np
 

@@ -1,3 +1,18 @@
+# INF209B − TOPICOS ESPECIAIS EM PROCESSAMENTO DE SINAIS:
+# VISAO COMPUTACIONAL
+#
+# PRATICA 02
+#
+# RA: 21201920754
+# NOME: RAFAEL COSTA FERNANDES
+#
+# E−MAIL: COSTA.FERNANDES@UFABC.EDU.BR
+#
+# DESCRICAO:
+# Exercicio n.3 - Limiarizacao
+# Abre uma foto e realiza dez passos de limiarizacao, de 0 a 100%.
+# Operacao pixel a pixel, o openCv trabalha com intensidades 0 para o valor Falso e 255 para o valor True.
+
 import cv2
 import numpy as np
 

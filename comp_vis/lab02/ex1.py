@@ -1,3 +1,20 @@
+# INF209B − TOPICOS ESPECIAIS EM PROCESSAMENTO DE SINAIS:
+# VISAO COMPUTACIONAL
+#
+# PRATICA 02
+#
+# RA: 21201920754
+# NOME: RAFAEL COSTA FERNANDES
+#
+# E−MAIL: COSTA.FERNANDES@UFABC.EDU.BR
+#
+# DESCRICAO:
+# Exercicio n.1
+# Importa a duas fotos tiradas no experimento anterior
+# Seleciona o ROI da foto do rosto e aplica em uma posicao escolhida no objeto
+# Salva a imagem final
+
+
 import numpy as np
 import cv2 
 

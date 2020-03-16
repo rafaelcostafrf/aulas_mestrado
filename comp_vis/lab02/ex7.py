@@ -1,3 +1,19 @@
+# INF209B − TOPICOS ESPECIAIS EM PROCESSAMENTO DE SINAIS:
+# VISAO COMPUTACIONAL
+#
+# PRATICA 02
+#
+# RA: 21201920754
+# NOME: RAFAEL COSTA FERNANDES
+#
+# E−MAIL: COSTA.FERNANDES@UFABC.EDU.BR
+#
+# DESCRICAO:
+# Exercicio n.7 - Tecnicas de Filtragem
+# Abre uma foto, adiciona ruido aleatorio, e Blur Gaussiano, blur, e um blur por media.
+# Mostra as imagens, para poder comparar entre elas.
+
+
 import numpy as np
 import cv2
 
