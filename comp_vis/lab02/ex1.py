@@ -21,10 +21,12 @@ import cv2
 img = cv2.cvtColor(cv2.imread('fotos_ex/rosto.jpg'),cv2.COLOR_BGR2RGB)
 plt.figure(figsize=(10,10))
 plt.imshow(img)
+plt.title('Rosto Original')
 plt.show()
 obj = cv2.cvtColor(cv2.imread('fotos_ex/objeto.jpg'),cv2.COLOR_BGR2RGB)
 plt.figure(figsize=(10,10))
 plt.imshow(obj)
+plt.title('Objeto')
 plt.show()
 
 in_h = 470
@@ -36,6 +38,7 @@ ROI = img[in_v:fim_v, in_h:fim_h]
 obj[in_v:fim_v, in_h-120:fim_h-120]= ROI
 plt.figure(figsize=(10,10))
 plt.imshow(obj)
+plt.title('Foto Mesclada')
 plt.show()
 cv2.imwrite('fotos_ex/mistura_ROI.jpg',obj)
-
+print('Foto Salva em fotos_ex/mistura_ROI.jpg')

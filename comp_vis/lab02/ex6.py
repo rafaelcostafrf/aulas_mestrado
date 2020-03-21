@@ -24,6 +24,7 @@ img_c = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 _,th1 = cv2.threshold(img_c,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
 plt.figure(figsize=(10,10))
 plt.imshow(th1, cmap='gray', vmin=0, vmax=255)
+plt.title('Limiar em escala de cinza')
 plt.show()
 
 #colorida
@@ -43,4 +44,5 @@ img_th[:,:,1]=thg
 img_th[:,:,2]=thr
 plt.figure(figsize=(10,10))
 plt.imshow(cv2.cvtColor(img_th,cv2.COLOR_BGR2RGB))
+plt.title('Limiar colorido')
 plt.show()

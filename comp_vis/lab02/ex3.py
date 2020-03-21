@@ -36,6 +36,8 @@ for k in lim:
                 thr[ii,jj] = 255
     plt.figure(figsize=(10,10))
     plt.imshow(thr, cmap='gray', vmin=0, vmax=255)
+    str = ("Limiarizacao %i%%" % (k*100))
+    plt.title(str)
     plt.show()
                 
         

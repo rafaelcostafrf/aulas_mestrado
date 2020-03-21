@@ -27,11 +27,11 @@ size=5
 k_f = cv2.GaussianBlur(img,(size,size),10)
 
 plt.figure(figsize=(20,20))
-plt.subplot(121)
+ax1=plt.subplot(121)
 plt.imshow(img)
-plt.subplot(122)
+ax2=plt.subplot(122)
 plt.imshow(k_f)
-plt.show()
+
 
 
 size=5
@@ -39,19 +39,27 @@ size=5
 k_f = cv2.blur(img,(size,size))
 
 plt.figure(figsize=(20,20))
-plt.subplot(121)
+ax3=plt.subplot(121)
 plt.imshow(img)
-plt.subplot(122)
+ax4=plt.subplot(122)
 plt.imshow(k_f)
-plt.show()
+
 
 size=5
 
 k_f = cv2.medianBlur(img,size)
 
 plt.figure(figsize=(20,20))
-plt.subplot(121)
+ax5=plt.subplot(121)
 plt.imshow(img)
-plt.subplot(122)
+ax6=plt.subplot(122)
 plt.imshow(k_f)
+
+
+ax1.title.set_text('Ruido')
+ax2.title.set_text('Blur Gaussiano')
+ax3.title.set_text('Ruido')
+ax4.title.set_text('Blur')
+ax5.title.set_text('Ruido')
+ax6.title.set_text('Blur por Mediana')
 plt.show()

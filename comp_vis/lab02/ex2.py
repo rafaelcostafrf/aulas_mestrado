@@ -23,17 +23,24 @@ img_camera = cv2.imread('arquivos_auxiliares/cameraman.tif')
 img_camera = cv2.cvtColor(img_camera, cv2.COLOR_BGR2GRAY)
 (largura,altura) = img_camera.shape[:2]
 
+ctes = [-200,-100,100,200]
 
-cte = 100
-for ii in range(largura):
-    for jj in range(altura): #faz a soma pixel a pixel, com um teste de overflow (para evitar overflow no teste, dividido por 2)
-            if img_camera[ii,jj]/2 + cte/2>255/2: 
-                img_camera[ii,jj] = 255
-            else:
-                img_camera[ii,jj] = img_camera[ii,jj] + cte
-plt.figure(figsize=(10,10)) 
-plt.imshow(img_camera, cmap='gray', vmin=0, vmax=255)
-plt.show()
+for cte in ctes:
+    for ii in range(largura):
+        for jj in range(altura): #faz a soma pixel a pixel, com um teste de overflow (para evitar overflow no teste, dividido por 2)
+                if img_camera[ii,jj]/2 + cte/2>255/2: 
+                    img_camera[ii,jj] = 255
+                elif img_camera[ii,jj]/2+127+cte/2<127:
+                    img_camera[ii,jj] = 0
+                else:
+                    img_camera[ii,jj] = img_camera[ii,jj] + cte
+    plt.figure(figsize=(10,10)) 
+    plt.imshow(img_camera, cmap='gray', vmin=0, vmax=255)
+    str = ("Fotografo - Exposicao %i" %(cte))
+    plt.title(str)
+    plt.show()
+    img_camera = cv2.imread('arquivos_auxiliares/cameraman.tif')
+    img_camera = cv2.cvtColor(img_camera, cv2.COLOR_BGR2GRAY)
 
 
 #Soma ponderada das imagens dos carrinhos em escala de cinza 8 bits
@@ -62,6 +69,7 @@ for ii in range(largura):
             imgp_c[ii,jj] = cte*img4_c[ii,jj]+cte*img5_c[ii,jj]+cte*img6_c[ii,jj]
 plt.figure(figsize=(10,10)) 
 plt.imshow(imgp_c, cmap='gray', vmin=0, vmax=255)
+plt.title('Carrinhos - mistura de canais e mistura de imagens')
 plt.show()
 
 #Soma ponderada das imagens dos carrinhos em BGR 8 bits
@@ -78,6 +86,7 @@ for ii in range(largura):
                 imgp_col[ii,jj,k] = cte*img4[ii,jj,k]+cte*img5[ii,jj,k]+cte*img6[ii,jj,k]
 plt.figure(figsize=(10,10))                
 plt.imshow(cv2.cvtColor(imgp_col,cv2.COLOR_BGR2RGB))
+plt.title('Carrinhos - mistura de imagens')
 plt.show()
 
 #Subtracao das imagens de coca-cola colorida
@@ -98,6 +107,7 @@ for ii in range(largura):
                 img_sub[ii,jj,k] = img7[ii,jj,k]-img8[ii,jj,k]
 plt.figure(figsize=(10,10))            
 plt.imshow(img_sub)
+plt.title('Coca Cola - subtracao de imagens')
 plt.show()
 
 #Subtracao das imagens de coca-cola em escala de cinzas
@@ -123,5 +133,6 @@ for ii in range(largura):
             img_sub_c[ii,jj] = img7_c[ii,jj]-img8_c[ii,jj]
 plt.figure(figsize=(10,10))              
 plt.imshow(img_sub_c, cmap='gray', vmin=0, vmax=255)
+plt.title('Coca Cola - mistura de canais e subtracao de imagens')
 plt.show()
 
