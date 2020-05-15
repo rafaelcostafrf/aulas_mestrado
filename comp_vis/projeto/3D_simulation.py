@@ -17,8 +17,10 @@ from scipy.spatial.transform import Rotation as R
 
 #Custom Functions
 from environment.quadrotor_env import quad, sensor
-from environment.quaternion_euler_utility import quat_euler, euler_quat, quat_rot_mat
+from environment.quaternion_euler_utility import quat_euler, euler_quat, quat_rot_mat, deriv_quat
 from controller.model import ActorCritic
+from controller.dl_auxiliary import dl_in_gen
+
 
 ## ALGORITMO DE TESTE PPO ##
 time_int_step = 0.01
@@ -40,13 +42,14 @@ class MyApp(ShowBase):
         
         
         # ENV SETUP
-        
-        self.env = quad(time_int_step, max_timesteps, direct_control=1, deep_learning=1, T=T, debug = 0)
+        self.env = quad(time_int_step, max_timesteps, direct_control=1, T=T)
         self.sensor = sensor(self.env)
+        self.aux_dl = dl_in_gen(T, self.env.state_size, self.env.action_size)    
         
-        state_dim = self.env.deep_learning_in_size
+        state_dim = self.aux_dl.deep_learning_in_size
         self.policy = ActorCritic(state_dim, action_dim=4, action_std=0).to(device)
-        #LOAD TRAINED POLICY
+        
+        #CONTROLLER SETUP
         try:
             self.policy.load_state_dict(torch.load('./controller/PPO_continuous_solved_drone.pth',map_location=device))
             print('Saved policy loaded')
@@ -54,14 +57,14 @@ class MyApp(ShowBase):
             print('Could not load policy')
             sys.exit(1)
 
+
+
+
         # Load the environment model.
         self.scene = self.loader.loadModel(mydir + "/models/city.egg")
         self.scene.reparentTo(self.render)
         self.scene.setScale(1, 1, 1)
         self.scene.setPos(0, 0, 0)
-        
-        
-        # END OF ENV SETUP
         
         # Load the skybox
         self.skybox = self.loader.loadModel(mydir + "/models/skybox.egg")
@@ -144,7 +147,7 @@ class MyApp(ShowBase):
         self.checker_scale = 0.5
         self.checker_sqr_size = 0.2046
         self.checker.setScale(self.checker_scale, self.checker_scale, 1)
-        self.checker.setPos(4*self.checker_scale*self.checker_sqr_size, 2.5*self.checker_scale*self.checker_sqr_size, 0.1)
+        self.checker.setPos(3*self.checker_scale*self.checker_sqr_size, 2.5*self.checker_scale*self.checker_sqr_size, 0.001)
         
         #env cam
         self.cam.node().getLens().setFilmSize(36, 24)
@@ -175,19 +178,39 @@ class MyApp(ShowBase):
     def drone_position_task(self, task):
         if self.calibrated:
             if task.frame == 0 or self.env.done:
-                self.network_in = self.env.reset()
+                
+                states, action = self.env.reset()
+                self.network_in = self.aux_dl.dl_input(states, action)
+                
+                
                 self.sensor.reset()
                 pos = self.env.state[0:5:2]
                 ang = self.env.ang
                 self.a = np.zeros(4)
             else:
                 action = self.policy.actor(torch.FloatTensor(self.network_in).to(device)).cpu().detach().numpy()
-                self.network_in, _, done = self.env.step(action)
+                states, _, done = self.env.step(action)
                 
                 _, self.velocity_accel, self.pos_accel = self.sensor.accel_int()
                 self.quaternion_gyro = self.sensor.gyro_int()
+                self.ang_vel = self.sensor.gyro()
+                quaternion_vel = deriv_quat(self.ang_vel, self.quaternion_gyro)
                 self.pos_gps, self.vel_gps = self.sensor.gps()
                 self.quaternion_triad, _ = self.sensor.triad()
+                
+                #SENSOR CONTROL
+                pos_vel = np.array([self.pos_accel[0], self.velocity_accel[0],
+                                    self.pos_accel[1], self.velocity_accel[1],
+                                    self.pos_accel[2], self.velocity_accel[2]])
+                
+                states_sens = [np.concatenate((pos_vel, self.quaternion_gyro, quaternion_vel))]
+
+                self.network_in = self.aux_dl.dl_input(states_sens, [action])
+                
+                
+
+                
+
                 
                 pos = self.env.state[0:5:2]
                 ang = self.env.ang
@@ -200,8 +223,8 @@ class MyApp(ShowBase):
             self.quad.setHpr(*ang_deg)
             self.quad.setPos(*pos)
             self.cam.lookAt(self.quad)
-            # self.quad.setHpr(0, 0, 45)
-            # self.quad.setPos(5, 0, 5)
+            # self.quad.setHpr(0, -45, 0)
+            # self.quad.setPos(0, 5, 6)
             for v in self.env.w:
                 if v<0:
                     print('negativo')
@@ -226,7 +249,7 @@ class MyApp(ShowBase):
     def calibrate(self, task):
         if task.frame == 0:
             self.fast = cv.FastFeatureDetector_create()
-            self.fast.setThreshold(73)
+            self.fast.setThreshold(20)
             self.criteria = (cv.TERM_CRITERIA_EPS + cv.TermCriteria_COUNT, 1, 0.0001) 
             self.nCornersCols = 9
             self.nCornersRows = 6
@@ -240,15 +263,18 @@ class MyApp(ShowBase):
                 print('Calibration File Loaded')
                 return task.done
             except:
+                print('Could Not Load Calibration File, Calibrating... ')
                 self.calibrated = False
                 self.quad.setPos(10,10,10)
                 self.cam_pos = []
                 self.objpoints = []
                 self.imgpoints = []
                 
-        rand_pos = (np.random.random(3)-0.5)*10
-        rand_pos[2] = np.random.random()*3+1
+        rand_pos = (np.random.random(3)-0.5)*5
+        rand_pos[2] = np.random.random()*3+2
         cam_pos = tuple(rand_pos)
+        self.cam.reparentTo(self.render)
+        self.cam_1.reparentTo(self.render)
         self.cam.setPos(*cam_pos)
         self.cam.lookAt(self.checker)
         self.cam_1.setPos(*cam_pos)
@@ -266,7 +292,7 @@ class MyApp(ShowBase):
                 img = cv.drawChessboardCorners(img, (self.nCornersCols, self.nCornersRows), corners, ret)
                 cv.imshow('img',img)
 
-        if len(self.objpoints) > 50:
+        if len(self.objpoints) > 70:
             ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(self.objpoints, self.imgpoints, self.gray.shape[::-1], None, None)
             if ret:
                 h,  w = img.shape[:2]
@@ -281,7 +307,11 @@ class MyApp(ShowBase):
                 self.calibrated = True
                 np.savez('./config/camera_calibration', mtx, dist)
                 print('Calibration File Saved')
-                return task.done
+                self.cam.reparentTo(self.quad)
+                self.cam.setPos(0,0,0.01)
+                self.cam_1.reparentTo(self.quad)
+                self.cam_1.setPos(0,0,0.01)
+                return task.done                
             else:
                 return task.cont
         else:
@@ -315,47 +345,39 @@ class MyApp(ShowBase):
                 fast_gray = cv.resize(gray, None, fx=1, fy=1)
                 corner_good = self.fast.detect(fast_gray)
                 if len(corner_good) > 83:
-                    point = []
-                    for kp in corner_good:
-                        point.append(kp.pt)
-                    point = np.array(point)
-                    mean = np.mean(point, axis=0)
-                    var = np.var(point, axis=0)
-                    if var[0] < 30000 and var[1] < 10000:
-                        ret, corners = cv.findChessboardCorners(img, (self.nCornersCols, self.nCornersRows),
-                                                                cv.CALIB_CB_ADAPTIVE_THRESH + cv.CALIB_CB_NORMALIZE_IMAGE)
+                    ret, corners = cv.findChessboardCorners(img, (self.nCornersCols, self.nCornersRows),
+                                                            cv.CALIB_CB_ADAPTIVE_THRESH + cv.CALIB_CB_NORMALIZE_IMAGE)
+                    
+                    if ret:
+                        # corners2 = cv.cornerSubPix(self.gray, corners, (1, 1), (-1, -1), self.criteria)
+                        ret, rvecs, tvecs = cv.solvePnP(self.objp, corners, self.mtx, self.dist)
                         
                         if ret:
-                            # corners2 = cv.cornerSubPix(self.gray, corners, (1, 1), (-1, -1), self.criteria)
-                            ret, rvecs, tvecs = cv.solvePnP(self.objp, corners, self.mtx, self.dist)
-                            
-                            if ret:
-                                axis = np.float32([[3,0,0], [0,3,0], [0,0,-3]]).reshape(-1,3)
-                                imgpts, jac = cv.projectPoints(axis, rvecs, tvecs, self.mtx, self.dist)
-                                imgpts = imgpts.astype(np.int)
-        
-                                real_state = np.concatenate((self.env.state[0:5:2], self.env.state[6:10]))
-                                rvecs[2] *= -1 
-                                r = R.from_rotvec(rvecs.flatten()).inv()
-                                euler = r.as_euler('zyx')
-                                r = R.from_euler('zyx', -euler)
-                                quaternion = r.as_quat()   
-                                quaternion = np.concatenate(([quaternion[3]],quaternion[0:3]))
-                                tvecs[1:3] *= -1
-                                trans = np.dot(r.as_matrix(), tvecs).flatten() 
-                                
-                                trans[0] *= -1
-                                trans[1] *= -1
-                                trans[2] *= -1
-                                trans[2] -= 5
-                                
-                                
-                                image_state = np.concatenate((trans.flatten(), quaternion.flatten()))                    
-                                data, header = self.tabulate_gen(real_state, image_state, self.pos_accel, self.pos_gps, self.quaternion_gyro, self.quaternion_triad)
-                                print(tabulate(data, headers = header, numalign='center', stralign='center', floatfmt='.3f'))
-                                print('\n')
-                                self.draw(img, corners, imgpts)
-                                cv.imshow('img',img)
+                            axis = np.float32([[3,0,0], [0,3,0], [0,0,-3]]).reshape(-1,3)
+                            imgpts, jac = cv.projectPoints(axis, rvecs, tvecs, self.mtx, self.dist)
+                            imgpts = imgpts.astype(np.int)
+    
+                            real_state = np.concatenate((self.env.state[0:5:2], self.env.state[6:10]))
+                            rvecs[2] *= -1 
+                            r = R.from_rotvec(rvecs.flatten()).inv()
+                            euler = r.as_euler('zyx')
+                            r = R.from_euler('zyx', -euler)
+                            quaternion = r.as_quat()   
+                            quaternion = np.concatenate(([quaternion[3]],quaternion[0:3]))
+                            trans = np.dot(r.as_matrix().T, tvecs).flatten() 
+                            trans[0] *= -1
+                            trans[1] *= -1
+                            trans[2] += -5.01
+                            self.image_pos = trans
+                            self.image_quat = quaternion
+                            self.sensor.position_t0 = (self.sensor.position_t0+self.image_pos)/2
+                            self.sensor.quaternion_t0 = (self.sensor.quaternion_t0+self.image_quat)/2
+                            image_state = np.concatenate((trans.flatten(), quaternion.flatten()))                    
+                            data, header = self.tabulate_gen(real_state, image_state, self.pos_accel, self.pos_gps, self.quaternion_gyro, self.quaternion_triad)
+                            print(tabulate(data, headers = header, numalign='center', stralign='center', floatfmt='.3f'))
+                            print('\n')
+                            self.draw(img, corners, imgpts)
+                            cv.imshow('img',img)
         return task.cont
     
 app = MyApp()
