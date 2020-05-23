@@ -7,6 +7,7 @@ import cv2 as cv
 import panda3d
 import sys, os
 import torch
+import time
 
 #Panda 3D Imports
 from panda3d.core import Filename
@@ -24,10 +25,11 @@ from controller.dl_auxiliary import dl_in_gen
 
 ## ALGORITMO DE TESTE PPO ##
 time_int_step = 0.01
-max_timesteps = 1000
+max_timesteps = 3000
 T = 5
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 IMG_POS_DETER = True
+
 # Get the location of the 'py' file I'm running:
 mydir = os.path.abspath(sys.path[0])
 
@@ -39,13 +41,14 @@ class MyApp(ShowBase):
         ShowBase.__init__(self)
         self.calibrated = False
         self.disableMouse()
-        
+        self.time_total_img = []
+        self.time_total_sens = []
         
         # ENV SETUP
         self.env = quad(time_int_step, max_timesteps, direct_control=1, T=T)
         self.sensor = sensor(self.env)
         self.aux_dl = dl_in_gen(T, self.env.state_size, self.env.action_size)    
-        
+        self.error = []
         state_dim = self.aux_dl.deep_learning_in_size
         self.policy = ActorCritic(state_dim, action_dim=4, action_std=0).to(device)
         
@@ -56,9 +59,9 @@ class MyApp(ShowBase):
         except:
             print('Could not load policy')
             sys.exit(1)
-
-
-
+            
+        n_parameters = sum(p.numel() for p in self.policy.parameters())
+        print('Neural Network Number of Parameters: %i' %n_parameters)
 
         # Load the environment model.
         self.scene = self.loader.loadModel(mydir + "/models/city.egg")
@@ -178,11 +181,10 @@ class MyApp(ShowBase):
     def drone_position_task(self, task):
         if self.calibrated:
             if task.frame == 0 or self.env.done:
-                
-                states, action = self.env.reset()
+                # in_state = np.array([0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0])
+                in_state = None
+                states, action = self.env.reset(in_state)
                 self.network_in = self.aux_dl.dl_input(states, action)
-                
-                
                 self.sensor.reset()
                 pos = self.env.state[0:5:2]
                 ang = self.env.ang
@@ -190,28 +192,32 @@ class MyApp(ShowBase):
             else:
                 action = self.policy.actor(torch.FloatTensor(self.network_in).to(device)).cpu().detach().numpy()
                 states, _, done = self.env.step(action)
-                
+                time_iter = time.time()
                 _, self.velocity_accel, self.pos_accel = self.sensor.accel_int()
                 self.quaternion_gyro = self.sensor.gyro_int()
                 self.ang_vel = self.sensor.gyro()
                 quaternion_vel = deriv_quat(self.ang_vel, self.quaternion_gyro)
                 self.pos_gps, self.vel_gps = self.sensor.gps()
                 self.quaternion_triad, _ = self.sensor.triad()
-                
+                self.time_total_sens.append(time.time() - time_iter)
                 #SENSOR CONTROL
                 pos_vel = np.array([self.pos_accel[0], self.velocity_accel[0],
                                     self.pos_accel[1], self.velocity_accel[1],
                                     self.pos_accel[2], self.velocity_accel[2]])
                 
                 states_sens = [np.concatenate((pos_vel, self.quaternion_gyro, quaternion_vel))]
-
+                
                 self.network_in = self.aux_dl.dl_input(states_sens, [action])
                 
-                
-
-                
-
-                
+                error_i = np.concatenate((self.env.state[0:5:2]-self.pos_accel, self.env.state[6:10]-self.quaternion_gyro))
+                self.error.append(error_i)   
+                if len(self.error) > 1e4:
+                    error_final = np.array(self.error)
+                    # np.savez('./data/hover_img_det_results', error_final)
+                    time_total_img = np.mean(np.array(self.time_total_img))
+                    time_total_sens = np.mean(np.array(self.time_total_sens))
+                    print('Iteration Time: Img: %.5fms Sens: %.5fms' %(time_total_img*1000, time_total_sens*1000))
+                    sys.exit()
                 pos = self.env.state[0:5:2]
                 ang = self.env.ang
                 for i, w_i in enumerate(self.env.w):
@@ -337,8 +343,10 @@ class MyApp(ShowBase):
         return img    
     
     def pos_deter(self, task):
-        if self.calibrated and task.frame % 10 == 0 and self.env.i > T:
+        time_iter = time.time()
+        if self.calibrated and task.frame % 10 == 0 and self.env.i > T:           
             ret, image = self.get_image()
+            cv.imshow('img', image)
             if ret:
                 img = cv.cvtColor(image, cv.COLOR_RGBA2BGR)
                 gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
@@ -370,14 +378,15 @@ class MyApp(ShowBase):
                             trans[2] += -5.01
                             self.image_pos = trans
                             self.image_quat = quaternion
-                            self.sensor.position_t0 = (self.sensor.position_t0+self.image_pos)/2
-                            self.sensor.quaternion_t0 = (self.sensor.quaternion_t0+self.image_quat)/2
+                            self.sensor.position_t0 = self.image_pos
+                            self.sensor.quaternion_t0 = self.sensor.quaternion_t0
                             image_state = np.concatenate((trans.flatten(), quaternion.flatten()))                    
                             data, header = self.tabulate_gen(real_state, image_state, self.pos_accel, self.pos_gps, self.quaternion_gyro, self.quaternion_triad)
                             print(tabulate(data, headers = header, numalign='center', stralign='center', floatfmt='.3f'))
                             print('\n')
                             self.draw(img, corners, imgpts)
                             cv.imshow('img',img)
+        self.time_total_img.append(time.time()-time_iter)
         return task.cont
     
 app = MyApp()

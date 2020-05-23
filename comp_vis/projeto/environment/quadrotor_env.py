@@ -427,12 +427,12 @@ class quad():
         if current_state < target_state:
             self.reward = +500
             self.solved = 1
-            self.done = True 
+            # self.done = True 
             
         elif self.i >= self.n and not self.done:
             self.reward = self.reward
             self.done = True
-            self.solved = 0
+            # self.solved = 0
             
         elif self.done:
             self.reward = -200
