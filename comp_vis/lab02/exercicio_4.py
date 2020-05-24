@@ -1,22 +1,24 @@
-# INF209B − TOPICOS ESPECIAIS EM PROCESSAMENTO DE SINAIS:
-# VISAO COMPUTACIONAL
-#
-# PRATICA 02
-#
-# RA: 21201920754
-# NOME: RAFAEL COSTA FERNANDES
-#
-# E−MAIL: COSTA.FERNANDES@UFABC.EDU.BR
-#
-# DESCRICAO:
-# Exercicio n.4 - Histograma
-# Abre uma foto e calcula o histograma pixel a pixel.
-# utiliza a biblioteca matplotlib para expor o histograma em 8 bits.
-
-
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
+
+"""
+INF209B − TÓPICOS ESPECIAIS EM PROCESSAMENTO DE SINAIS:
+VISÃO COMPUTACIONAL
+
+PRÁTICA 02
+
+RA: 21201920754
+NOME: RAFAEL COSTA FERNANDES
+E−MAIL: COSTA.FERNANDES@UFABC.EDU.BR
+
+DESCRIÇÃO:
+Exercício n.4 
+    Histograma
+    Abre uma foto e calcula o histograma pixel a pixel.
+    utiliza a biblioteca matplotlib para expor o histograma em 8 bits.
+""" 
+
 
 img = cv2.imread('arquivos_auxiliares/coins.png')
 
@@ -61,6 +63,3 @@ plt.title('Histograma - Arroz')
 plt.xlabel('Valor')
 plt.ylabel('Ocorrencia')
 plt.show()
-
-
-

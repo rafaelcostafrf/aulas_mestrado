@@ -1,11 +1,42 @@
 import numpy as np
 import cv2 as cv
+import time
 from matplotlib import pyplot as plt
+
+"""
+INF209B − TÓPICOS ESPECIAIS EM PROCESSAMENTO DE SINAIS:
+
+VISAO COMPUTACIONAL
+
+PRÁTICA 03
+
+RA: 21201920754
+NOME: RAFAEL COSTA FERNANDES
+E−MAIL: COSTA.FERNANDES@UFABC.EDU.BR
+
+DESCRIÇÃO:
+Exercício n.1
+
+Determinação de bordas de uma imagem baseado em dois algoritmos: 
+    Algoritmo de Canny:
+        O algoritmo de canny segue uma lista de critérios para a detecção de bordas. 
+        Entre os critérios mais importantes:
+            Não pode haver falsos positivos.
+            As bordas devem estar bem localizadas (A distancia entre a borda e a borda real deve ser mínima)
+            Apenas uma resposta por borda
+        
+    Algoritmo Laplaciano:
+        A detecção de bordas pelo algoritmo laplaciano segue uma premissa simples, 
+        pixels em regiões de borda terão um pico de gradiente, em relação ao seu contorno.         
+
+"""
+
 
 plt.close('all')
 
 
 def canny(caminho_arquivo, cor=True):
+    t_i = time.time()
     # Leitura da Imagem
     img = cv.imread(caminho_arquivo, cor)
     # Reconhecimento das bordas pelo algoritmo de canny
@@ -39,10 +70,13 @@ def canny(caminho_arquivo, cor=True):
     plt.subplot(313).imshow(img_sum, cmap=cmap)        
     plt.title('Composicao')
     plt.show()
-    
+    t_f = time.time() - t_i
+    string =f'O algoritmo de Canny levou {t_f:.2f}s para uma ' + ('imagem colorida' if cor else 'imagem em escala de cinzas')
+    print(string)
 
 
 def laplace(caminho_arquivo, cor=True):
+    t_i = time.time()
     # Leitura da Imagem
     img = cv.imread(caminho_arquivo, cor)
     cmap = None if cor else 'gray'    
@@ -71,7 +105,10 @@ def laplace(caminho_arquivo, cor=True):
     plt.subplot(313).imshow(img_sum, cmap=cmap)
     plt.title('Composicao')
     plt.show()
-
+    t_f = time.time() - t_i
+    string =f'O algoritmo Laplaciano levou {t_f:.2f}s para uma ' + ('imagem colorida' if cor else 'imagem em escala de cinzas')
+    print(string)
+    
 ## METODO DE CANNY
 
 #COLORIDO

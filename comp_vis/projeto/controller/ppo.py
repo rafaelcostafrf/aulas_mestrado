@@ -4,8 +4,18 @@ from torch.distributions import MultivariateNormal
 import numpy as np
 from quadrotor_env import quad, render, animation
 from model import ActorCritic
-## ALGORITMO DE TREINAMENTO PPO BASEADO EM 
-## 
+
+"""
+MECHANICAL ENGINEERING POST-GRADUATE PROGRAM
+UNIVERSIDADE FEDERAL DO ABC - SANTO ANDRÉ, BRASIL
+
+NOME: RAFAEL COSTA FERNANDES
+RA: 21201920754
+E−MAIL: COSTA.FERNANDES@UFABC.EDU.BR
+
+DESCRIPTION:
+    PPO deep learning training algorithm. 
+"""
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 

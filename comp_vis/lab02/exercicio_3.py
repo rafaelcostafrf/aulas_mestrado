@@ -1,21 +1,23 @@
-# INF209B − TOPICOS ESPECIAIS EM PROCESSAMENTO DE SINAIS:
-# VISAO COMPUTACIONAL
-#
-# PRATICA 02
-#
-# RA: 21201920754
-# NOME: RAFAEL COSTA FERNANDES
-#
-# E−MAIL: COSTA.FERNANDES@UFABC.EDU.BR
-#
-# DESCRICAO:
-# Exercicio n.3 - Limiarizacao
-# Abre uma foto e realiza dez passos de limiarizacao, de 0 a 100%.
-# Operacao pixel a pixel, o openCv trabalha com intensidades 0 para o valor Falso e 255 para o valor True.
-
-from matplotlib import pyplot as plt
 import cv2
 import numpy as np
+from matplotlib import pyplot as plt
+
+"""
+INF209B − TÓPICOS ESPECIAIS EM PROCESSAMENTO DE SINAIS:
+VISÃO COMPUTACIONAL
+
+PRÁTICA 02
+
+RA: 21201920754
+NOME: RAFAEL COSTA FERNANDES
+E−MAIL: COSTA.FERNANDES@UFABC.EDU.BR
+
+DESCRIÇÃO:
+Exercício n.3 
+    Limiarizacao
+    Abre uma foto e realiza dez passos de limiarizacao, de 0 a 100%.
+    Operacao pixel a pixel, o openCv trabalha com intensidades 0 para o valor Falso e 255 para o valor True.
+"""
 
 img = cv2.imread('arquivos_auxiliares/rice.png')
 img_g = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -39,7 +41,3 @@ for k in lim:
     str = ("Limiarizacao %i%%" % (k*100))
     plt.title(str)
     plt.show()
-                
-        
-            
-    

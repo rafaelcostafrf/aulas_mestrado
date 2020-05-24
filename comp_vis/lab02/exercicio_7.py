@@ -1,22 +1,24 @@
-# INF209B − TOPICOS ESPECIAIS EM PROCESSAMENTO DE SINAIS:
-# VISAO COMPUTACIONAL
-#
-# PRATICA 02
-#
-# RA: 21201920754
-# NOME: RAFAEL COSTA FERNANDES
-#
-# E−MAIL: COSTA.FERNANDES@UFABC.EDU.BR
-#
-# DESCRICAO:
-# Exercicio n.7 - Tecnicas de Filtragem
-# Abre uma foto, adiciona ruido aleatorio, e Blur Gaussiano, blur, e um blur por media.
-# Mostra as imagens, para poder comparar entre elas.
-
-
-import numpy as np
 import cv2
+import numpy as np
 from matplotlib import pyplot as plt
+
+"""
+INF209B − TÓPICOS ESPECIAIS EM PROCESSAMENTO DE SINAIS:
+VISÃO COMPUTACIONAL
+
+PRÁTICA 02
+
+RA: 21201920754
+NOME: RAFAEL COSTA FERNANDES
+E−MAIL: COSTA.FERNANDES@UFABC.EDU.BR
+
+DESCRIÇÃO:
+Exercício n.7
+    Tecnicas de Filtragem
+    Abre uma foto, adiciona ruido aleatorio, e Blur Gaussiano, blur, e um blur por media.
+    Mostra as imagens, para poder comparar entre elas.
+""" 
+
 
 img = cv2.cvtColor(cv2.imread('fotos_ex/image1.jpeg'),cv2.COLOR_BGR2RGB)
 ruido = np.uint8((1.5*img.std()*np.random.random(img.shape)))

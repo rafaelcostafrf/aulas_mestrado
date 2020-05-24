@@ -1,23 +1,24 @@
-# INF209B − TOPICOS ESPECIAIS EM PROCESSAMENTO DE SINAIS:
-# VISAO COMPUTACIONAL
-#
-# PRATICA 02
-#
-# RA: 21201920754
-# NOME: RAFAEL COSTA FERNANDES
-#
-# E−MAIL: COSTA.FERNANDES@UFABC.EDU.BR
-#
-# DESCRICAO:
-# Exercicio n.5 - Histograma BGR e equalizacao
-# Abre uma foto e calcula o histograma pixel a pixel para cada canal de cor.
-# Separa cada canal de cor em uma imagem independente,
-# Realiza a equalizacao em cada canal de cor separadamente, depois realoca os canais em uma imagem unica
-
-
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
+
+"""
+INF209B − TÓPICOS ESPECIAIS EM PROCESSAMENTO DE SINAIS:
+VISÃO COMPUTACIONAL
+
+PRÁTICA 02
+
+RA: 21201920754
+NOME: RAFAEL COSTA FERNANDES
+E−MAIL: COSTA.FERNANDES@UFABC.EDU.BR
+
+DESCRIÇÃO:
+Exercício n.5 
+    Histograma BGR e equalizacao
+    Abre uma foto e calcula o histograma pixel a pixel para cada canal de cor.
+    Separa cada canal de cor em uma imagem independente,
+    Realiza a equalizacao em cada canal de cor separadamente, depois realoca os canais em uma imagem unica
+"""  
 
 img_c = cv2.imread('arquivos_auxiliares/peppers.png')
 

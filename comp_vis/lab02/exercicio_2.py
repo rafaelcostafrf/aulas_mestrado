@@ -1,21 +1,23 @@
-# INF209B − TOPICOS ESPECIAIS EM PROCESSAMENTO DE SINAIS:
-# VISAO COMPUTACIONAL
-#
-# PRATICA 02
-#
-# RA: 21201920754
-# NOME: RAFAEL COSTA FERNANDES
-#
-# E−MAIL: COSTA.FERNANDES@UFABC.EDU.BR
-#
-# DESCRICAO:
-# Exercicio n.2 - Fazendo as imagens demonstradas em aula
-# Descricao no passo a passo do algoritmo
-
-
-from matplotlib import pyplot as plt
-import numpy as np
 import cv2
+import numpy as np
+from matplotlib import pyplot as plt
+
+"""
+INF209B − TÓPICOS ESPECIAIS EM PROCESSAMENTO DE SINAIS:
+VISÃO COMPUTACIONAL
+
+PRÁTICA 02
+
+RA: 21201920754
+NOME: RAFAEL COSTA FERNANDES
+E−MAIL: COSTA.FERNANDES@UFABC.EDU.BR
+
+DESCRIÇÃO:
+    Exercício n.2 
+    Fazendo as imagens demonstradas em aula
+    Descrição no passo a passo do algoritmo
+"""
+
 
 #Aumenta exposicao da foto cameramam em um valor constante
 
@@ -135,4 +137,3 @@ plt.figure(figsize=(10,10))
 plt.imshow(img_sub_c, cmap='gray', vmin=0, vmax=255)
 plt.title('Coca Cola - mistura de canais e subtracao de imagens')
 plt.show()
-

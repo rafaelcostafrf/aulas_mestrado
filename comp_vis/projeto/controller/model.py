@@ -3,6 +3,18 @@ import torch.nn as nn
 from torch.distributions import MultivariateNormal
 import numpy as np
 
+"""
+MECHANICAL ENGINEERING POST-GRADUATE PROGRAM
+UNIVERSIDADE FEDERAL DO ABC - SANTO ANDRÉ, BRASIL
+
+NOME: RAFAEL COSTA FERNANDES
+RA: 21201920754
+E−MAIL: COSTA.FERNANDES@UFABC.EDU.BR
+
+DESCRIPTION:
+    PPO neural network model
+    hidden layers has 64 neurons
+"""
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 

@@ -3,6 +3,29 @@ import cv2 as cv
 import glob
 from matplotlib import pyplot as plt
 
+"""
+INF209B − TÓPICOS ESPECIAIS EM PROCESSAMENTO DE SINAIS:
+
+VISAO COMPUTACIONAL
+
+PRÁTICA 04
+
+RA: 21201920754
+NOME: RAFAEL COSTA FERNANDES
+E−MAIL: COSTA.FERNANDES@UFABC.EDU.BR
+
+DESCRIÇÃO:
+Exercécio n.3
+
+Plota as epilinhas, dado duas imagens de um par de câmeras em disposição estéreo.
+Preferencialmente deve haver um plano bem definido na imagem. 
+Este plano será utilizado para a determinação do plano epipolar, e será a base para as epilinhas.
+
+Fonte parcial do código: https://docs.opencv.org/master/da/de9/tutorial_py_epipolar_geometry.html
+A função SIFT não existe mais no opencv 4.2 por questões de Direitos Autorais
+O opencv deve ser revertido para a versão 3.4.2 contrib para compatibilidade com a função.
+Aparentemente a versão 3.4.2 roda todos os algoritmos utilizados na disciplina, então sem problemas.
+"""
 plt.close('all')
 cam_name = glob.glob('.\\camera_properties\\*.npz')
 mtx = []
@@ -15,10 +38,10 @@ for cam in cam_name:
     
 
 
-#Imagem da camera esquerda
+# Imagem da camera esquerda
 img1 = cv.imread('.\\imagens\\epipolar\\left.jpg',0)  
 
-#Processo de igualar resolução e retirar as distorções
+# Processo de igualar resolução e retirar as distorções
 img1 = cv.resize(img1, (640, 480))
 h,  w = img1.shape[:2]
 newcameramtx, roi = cv.getOptimalNewCameraMatrix(mtx[0], dist[0], (w,h), 1, (w,h))
@@ -27,11 +50,11 @@ x, y, w, h = roi
 img1 = dst[y:y+h, x:x+w]
 
 
-#Imagem da camera direita
+# Imagem da camera direita
 img2 = cv.imread('.\\imagens\\epipolar\\right.jpg',0) 
 img2 = cv.resize(img2, (640, 480))
 
-#Processo de igualar resolução e retirar as distorções
+# Processo de igualar resolução e retirar as distorções
 h,  w = img2.shape[:2]
 newcameramtx, roi = cv.getOptimalNewCameraMatrix(mtx[1], dist[1], (w,h), 1, (w,h))
 dst = cv.undistort(img2, mtx[1], dist[1], None, newcameramtx)
@@ -74,12 +97,14 @@ pts2 = np.int32(pts2)
 
 # Matriz Fundamental
 F, mask = cv.findFundamentalMat(pts1,pts2,cv.FM_LMEDS)
+print('Matriz Fundamental: ')
+print(F)
 # Matriz Essencial
 E = []
-names = ['c920', 'c270']
-for mtx_i, name in zip(mtx, names):
+nomes = ['c920', 'c270']
+for mtx_i, nome in zip(mtx, nomes):
     E_i = np.dot(mtx_i.T, np.dot(F, mtx_i))
-    print(name+' essential Matrix: ')
+    print('Matriz essencial webcam '+name)
     print(E_i)
     E.append(E_i)
 

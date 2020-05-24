@@ -8,7 +8,18 @@ import numpy as np
 from quadrotor_env import quad, render, animation
 from model import ActorCritic
 
-## ALGORITMO DE TESTE PPO ## 
+"""
+MECHANICAL ENGINEERING POST-GRADUATE PROGRAM
+UNIVERSIDADE FEDERAL DO ABC - SANTO ANDRÉ, BRASIL
+
+NOME: RAFAEL COSTA FERNANDES
+RA: 21201920754
+E−MAIL: COSTA.FERNANDES@UFABC.EDU.BR
+
+DESCRIPTION:
+    PPO testing algorithm (no training, only forward passes)
+"""
+
 time_int_step = 0.01
 max_timesteps = 1000
 T = 5

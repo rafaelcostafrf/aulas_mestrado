@@ -18,22 +18,55 @@ from scipy.spatial.transform import Rotation as R
 
 #Custom Functions
 from environment.quadrotor_env import quad, sensor
-from environment.quaternion_euler_utility import quat_euler, euler_quat, quat_rot_mat, deriv_quat
+from environment.quaternion_euler_utility import deriv_quat
 from controller.model import ActorCritic
 from controller.dl_auxiliary import dl_in_gen
 
+"""
+INF209B − TÓPICOS ESPECIAIS EM PROCESSAMENTO DE SINAIS:
 
-## ALGORITMO DE TESTE PPO ##
+VISAO COMPUTACIONAL
+
+PROJETO
+
+RA: 21201920754
+NOME: RAFAEL COSTA FERNANDES
+E−MAIL: COSTA.FERNANDES@UFABC.EDU.BR
+
+DESCRIÇÃO:
+    Ambiente 3D de simulação do quadrirrotor. 
+    Dividido em tarefas, Camera Calibration e Drone position
+    Se não haver arquivo de calibração de camera no caminho ./config/camera_calibration.npz, realiza a calibração da câmera tirando 70 fotos aleatórias do padrão xadrez
+    
+    A bandeira IMG_POS_DETER adiciona a tarefa de determinação de posição por visão computacional, utilizando um marco artificial que já está no ambiente 3D, na origem. 
+    A bandeira REAL_STATE_CONTROL determina se o algoritmo de controle será alimentado pelos valores REAIS do estado ou os valores estimados pelos sensores a bordo
+    
+    O algoritmo não precisa rodar em tempo real, a simulação está totalmente disvinculada da velocidade de renderização do ambiente 3D.
+    Se a simulação 3D estiver muito lenta, recomendo mudar a resolução nativa no arquivo de configuração ./config/conf.prc
+    Mudando a resolução PROVAVELMENTE será necessário recalibrar a câmera, mas sem problemas adicionais. 
+    
+    Recomendado rodar em um computador com placa de vídeo. 
+    Em um i5-4460 com uma AMD R9-290:
+        Taxa de FPS foi cerca de 95 FPS com a bandeira IMG_POS_DETER = False e REAL_STATE_CONTROL = True
+        Taxa de FPS foi cerca de 35 FPS com a bandeira IMG_POS_DETER = True e REAL_STATE_CONTROL = False
+    
+    O algoritmo de detecção de pontos FAST ajudou na velocidade da detecção, mas a performance precisa ser melhorada 
+    (principalmente para frames em que o tabuleiro de xadrez aparece parcialmente)
+    
+    
+"""
+
+
+## PPO SETUP ##
 time_int_step = 0.01
 max_timesteps = 3000
 T = 5
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 IMG_POS_DETER = True
+REAL_STATE_CONTROL = False
 
-# Get the location of the 'py' file I'm running:
 mydir = os.path.abspath(sys.path[0])
 
-# Convert that to panda's unix-style notation.
 mydir = Filename.fromOsSpecific(mydir).getFullpath()
 
 class MyApp(ShowBase):
@@ -200,20 +233,21 @@ class MyApp(ShowBase):
                 self.pos_gps, self.vel_gps = self.sensor.gps()
                 self.quaternion_triad, _ = self.sensor.triad()
                 self.time_total_sens.append(time.time() - time_iter)
+                
                 #SENSOR CONTROL
                 pos_vel = np.array([self.pos_accel[0], self.velocity_accel[0],
                                     self.pos_accel[1], self.velocity_accel[1],
                                     self.pos_accel[2], self.velocity_accel[2]])
-                
-                states_sens = [np.concatenate((pos_vel, self.quaternion_gyro, quaternion_vel))]
-                
-                self.network_in = self.aux_dl.dl_input(states_sens, [action])
+                if REAL_STATE_CONTROL:
+                    self.network_in = self.aux_dl.dl_input(states, [action])
+                else:
+                    states_sens = [np.concatenate((pos_vel, self.quaternion_gyro, quaternion_vel))]                
+                    self.network_in = self.aux_dl.dl_input(states_sens, [action])
                 
                 error_i = np.concatenate((self.env.state[0:5:2]-self.pos_accel, self.env.state[6:10]-self.quaternion_gyro))
                 self.error.append(error_i)   
                 if len(self.error) > 1e4:
                     error_final = np.array(self.error)
-                    # np.savez('./data/hover_img_det_results', error_final)
                     time_total_img = np.mean(np.array(self.time_total_img))
                     time_total_sens = np.mean(np.array(self.time_total_sens))
                     print('Iteration Time: Img: %.5fms Sens: %.5fms' %(time_total_img*1000, time_total_sens*1000))
@@ -229,8 +263,6 @@ class MyApp(ShowBase):
             self.quad.setHpr(*ang_deg)
             self.quad.setPos(*pos)
             self.cam.lookAt(self.quad)
-            # self.quad.setHpr(0, -45, 0)
-            # self.quad.setPos(0, 5, 6)
             for v in self.env.w:
                 if v<0:
                     print('negativo')
@@ -246,8 +278,6 @@ class MyApp(ShowBase):
         image = np.frombuffer(img, np.uint8)
         if len(image) > 0:
             image = np.reshape(image, (tex.getYSize(), tex.getXSize(), 4))
-            # image = np.flipud(image)
-            # image = cv.resize(image, (640, 360))
             return True, image
         else:
             return False, None
@@ -293,7 +323,6 @@ class MyApp(ShowBase):
                                                     cv.CALIB_CB_ADAPTIVE_THRESH + cv.CALIB_CB_NORMALIZE_IMAGE)
             if ret:
                 self.objpoints.append(self.objp)             
-                # corners2 = cv.cornerSubPix(self.gray, corners, (1, 1), (-1, -1), self.criteria)
                 self.imgpoints.append(corners)
                 img = cv.drawChessboardCorners(img, (self.nCornersCols, self.nCornersRows), corners, ret)
                 cv.imshow('img',img)
@@ -356,7 +385,6 @@ class MyApp(ShowBase):
                                                             cv.CALIB_CB_ADAPTIVE_THRESH + cv.CALIB_CB_NORMALIZE_IMAGE)
                     
                     if ret:
-                        # corners2 = cv.cornerSubPix(self.gray, corners, (1, 1), (-1, -1), self.criteria)
                         ret, rvecs, tvecs = cv.solvePnP(self.objp, corners, self.mtx, self.dist)
                         
                         if ret:

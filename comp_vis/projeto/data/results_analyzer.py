@@ -1,6 +1,18 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
+"""
+MECHANICAL ENGINEERING POST-GRADUATE PROGRAM
+UNIVERSIDADE FEDERAL DO ABC - SANTO ANDRÉ, BRASIL
+
+NOME: RAFAEL COSTA FERNANDES
+RA: 21201920754
+E−MAIL: COSTA.FERNANDES@UFABC.EDU.BR
+
+DESCRIPTION:
+    3D enviornment results analyzer
+"""
+
 a = np.load('random_img_det_results.npz')
 b = np.load('random_accel_results.npz')
 

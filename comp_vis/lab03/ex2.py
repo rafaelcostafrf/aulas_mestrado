@@ -1,6 +1,29 @@
 import numpy as np
 import cv2 as cv
 from matplotlib import pyplot as plt
+import time
+"""
+INF209B − TÓPICOS ESPECIAIS EM PROCESSAMENTO DE SINAIS:
+
+VISAO COMPUTACIONAL
+
+PRÁTICA 03
+
+RA: 21201920754
+NOME: RAFAEL COSTA FERNANDES
+E−MAIL: COSTA.FERNANDES@UFABC.EDU.BR
+
+DESCRIÇÃO:
+Exercício n.2
+
+Determina as bordas de uma imagem baseado no algoritmo watershed, que pode ser separado em diversas etapas:
+1. Limiarização da imagem a partir do algoritmo de Otsu
+2. Remoção de Ruídos da imagem
+3. Determinação da área de fundo da imagem
+4. Determinação da área de frente da imagem
+5. Determinação da região desconhecida 
+6. Preenchimento da imagem com o algoritmo watershed (bacia hidrográfica)
+"""
 plt.close('all')
 
 
@@ -14,9 +37,10 @@ titles = ('Algoritmo Watershed - Rafael',
           'Algoritmo Watershed - Cameraman',
           'Algoritmo Watershed - Pimentas')
 
-
-for img, title in zip(images, titles):    
-    plt.figure()
+t_f = []
+for img, title in zip(images, titles):
+    t_i = time.time()
+    plt.figure(figsize=(18, 16))
     
     plt.suptitle(title)
     plt.subplot(331).imshow(img)
@@ -47,7 +71,7 @@ for img, title in zip(images, titles):
     plt.subplot(335).imshow(dist_transform, cmap='gray')
     plt.title('Transformada de Distância')
     
-    ret, frente = cv.threshold(dist_transform, 0.5*dist_transform.max(), 255, 0)
+    ret, frente = cv.threshold(dist_transform, 0.15*dist_transform.max(), 255, 0)
     
     plt.subplot(336).imshow(frente, cmap='gray')
     plt.title('Limiarização na transformada de distância')
@@ -74,3 +98,9 @@ for img, title in zip(images, titles):
     
     plt.subplot(339).imshow(img)
     plt.title('Imagem Final')
+    t_f.append(time.time()-t_i)
+    plt.show()
+
+m_t = np.mean(t_f)
+string = f'O tempo médio para o algoritmo foi de {m_t:.2f} segundos'
+print(string)
