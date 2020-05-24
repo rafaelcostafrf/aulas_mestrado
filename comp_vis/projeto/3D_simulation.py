@@ -348,44 +348,42 @@ class MyApp(ShowBase):
             ret, image = self.get_image()
             if ret:
                 img = cv.cvtColor(image, cv.COLOR_RGBA2BGR)
-            #     gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-            #     fast_gray = cv.resize(gray, None, fx=1, fy=1)
-            #     corner_good = self.fast.detect(fast_gray)
-            #     if len(corner_good) > 83:
-            #         ret, corners = cv.findChessboardCorners(img, (self.nCornersCols, self.nCornersRows),
-            #                                                 cv.CALIB_CB_ADAPTIVE_THRESH + cv.CALIB_CB_NORMALIZE_IMAGE)
+                gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+                fast_gray = cv.resize(gray, None, fx=1, fy=1)
+                corner_good = self.fast.detect(fast_gray)
+                if len(corner_good) > 83:
+                    ret, corners = cv.findChessboardCorners(img, (self.nCornersCols, self.nCornersRows),
+                                                            cv.CALIB_CB_ADAPTIVE_THRESH + cv.CALIB_CB_NORMALIZE_IMAGE)
                     
-            #         if ret:
-            #             # corners2 = cv.cornerSubPix(self.gray, corners, (1, 1), (-1, -1), self.criteria)
-            #             ret, rvecs, tvecs = cv.solvePnP(self.objp, corners, self.mtx, self.dist)
+                    if ret:
+                        # corners2 = cv.cornerSubPix(self.gray, corners, (1, 1), (-1, -1), self.criteria)
+                        ret, rvecs, tvecs = cv.solvePnP(self.objp, corners, self.mtx, self.dist)
                         
-            #             if ret:
-            #                 axis = np.float32([[3,0,0], [0,3,0], [0,0,-3]]).reshape(-1,3)
-            #                 imgpts, jac = cv.projectPoints(axis, rvecs, tvecs, self.mtx, self.dist)
-            #                 imgpts = imgpts.astype(np.int)
+                        if ret:
+                            axis = np.float32([[3,0,0], [0,3,0], [0,0,-3]]).reshape(-1,3)
+                            imgpts, jac = cv.projectPoints(axis, rvecs, tvecs, self.mtx, self.dist)
+                            imgpts = imgpts.astype(np.int)
     
-            #                 real_state = np.concatenate((self.env.state[0:5:2], self.env.state[6:10]))
-            #                 rvecs[2] *= -1 
-            #                 r = R.from_rotvec(rvecs.flatten()).inv()
-            #                 euler = r.as_euler('zyx')
-            #                 r = R.from_euler('zyx', -euler)
-            #                 quaternion = r.as_quat()   
-            #                 quaternion = np.concatenate(([quaternion[3]],quaternion[0:3]))
-            #                 trans = np.dot(r.as_matrix().T, tvecs).flatten() 
-            #                 trans[0] *= -1
-            #                 trans[1] *= -1
-            #                 trans[2] += -5.01
-            #                 self.image_pos = trans
-            #                 self.image_quat = quaternion
-            #                 self.sensor.position_t0 = self.image_pos
-            #                 self.sensor.quaternion_t0 = self.sensor.quaternion_t0
-            #                 image_state = np.concatenate((trans.flatten(), quaternion.flatten()))                    
-            #                 data, header = self.tabulate_gen(real_state, image_state, self.pos_accel, self.pos_gps, self.quaternion_gyro, self.quaternion_triad)
-            #                 print(tabulate(data, headers = header, numalign='center', stralign='center', floatfmt='.3f'))
-            #                 print('\n')
-            #                 self.draw(img, corners, imgpts)
-            path_name = f'./data/drone_camera/{task.frame:06d}.jpg'
-            cv.imwrite(path_name,img)
+                            real_state = np.concatenate((self.env.state[0:5:2], self.env.state[6:10]))
+                            rvecs[2] *= -1 
+                            r = R.from_rotvec(rvecs.flatten()).inv()
+                            euler = r.as_euler('zyx')
+                            r = R.from_euler('zyx', -euler)
+                            quaternion = r.as_quat()   
+                            quaternion = np.concatenate(([quaternion[3]],quaternion[0:3]))
+                            trans = np.dot(r.as_matrix().T, tvecs).flatten() 
+                            trans[0] *= -1
+                            trans[1] *= -1
+                            trans[2] += -5.01
+                            self.image_pos = trans
+                            self.image_quat = quaternion
+                            self.sensor.position_t0 = self.image_pos
+                            self.sensor.quaternion_t0 = self.sensor.quaternion_t0
+                            image_state = np.concatenate((trans.flatten(), quaternion.flatten()))                    
+                            data, header = self.tabulate_gen(real_state, image_state, self.pos_accel, self.pos_gps, self.quaternion_gyro, self.quaternion_triad)
+                            print(tabulate(data, headers = header, numalign='center', stralign='center', floatfmt='.3f'))
+                            print('\n')
+                            self.draw(img, corners, imgpts)
             cv.imshow('Drone Camera',img)
         self.time_total_img.append(time.time()-time_iter)
         return task.cont
